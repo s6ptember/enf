@@ -1,0 +1,291 @@
+<main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <div class="mb-8">
+        <nav class="text-sm text-gray-600">
+            <a href="{% url 'main:index' %}" 
+               hx-get="{% url 'main:index' %}" 
+               hx-target="#main-content" 
+               hx-push-url="true"
+               class="hover:text-gray-900">HOME</a>
+            <span class="mx-2">/</span>
+            <a href="{% url 'main:catalog' product.category.slug %}" 
+               hx-get="{% url 'main:catalog' product.category.slug %}" 
+               hx-target="#main-content" 
+               hx-push-url="true"
+               class="hover:text-gray-900">{{ product.category.name|upper }}</a>
+            <span class="mx-2">/</span>
+            <span class="text-gray-900">{{ product.name|upper }}</span>
+        </nav>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <!-- Product Images -->
+        <div class="space-y-4">
+            <!-- Main Image -->
+            <div class="aspect-square overflow-hidden bg-gray-100">
+                {% if product.main_image %}
+                    <img src="{{ product.main_image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-400">No Image</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Additional Images -->
+            {% if product.images.all %}
+            <div class="grid grid-cols-3 gap-2">
+                {% for image in product.images.all %}
+                <div class="aspect-square overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80">
+                    <img src="{{ image.image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-full object-cover"
+                         onclick="changeMainImage(this.src)">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Info -->
+        <div class="space-y-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">
+                    {{ product.name|upper }}
+                </h1>
+                <p class="text-lg text-gray-600 mb-4">{{ product.color|upper }}</p>
+                <p class="text-2xl font-bold text-gray-900">${{ product.price }}</p>
+            </div>
+
+            <!-- Sizes -->
+            {% if product.product_sizes.all %}
+            <div>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
+                <div class="grid grid-cols-4 gap-2">
+                    {% for product_size in product.product_sizes.all %}
+                    <div class="size-option">
+                        <input type="radio" 
+                               name="size" 
+                               class="size-radio hidden"
+                               id="size-{{ product_size.id }}"
+                               value="{{ product_size.id }}"
+                               data-size="{{ product_size.size.name }}"
+                               {% if product_size.stock == 0 %}disabled{% endif %}
+                               {% if forloop.first and product_size.stock > 0 %}checked{% endif %}>
+                        <label for="size-{{ product_size.id }}"
+                               class="block border border-gray-300 py-2 px-3 text-sm font-medium text-center cursor-pointer hover:border-gray-900 transition-colors {% if product_size.stock == 0 %}opacity-50 cursor-not-allowed{% endif %}">
+                            {{ product_size.size.name }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
+                <p class="text-sm text-gray-600">No sizes available</p>
+            </div>
+            {% endif %}
+
+            <!-- Add to Cart -->
+            <div class="space-y-4">
+                <button id="add-to-cart-btn" 
+                        class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"
+                        onclick="addToCart()"
+                        {% if not product.product_sizes.all %}disabled{% endif %}>
+                    ADD TO CART
+                </button>
+                
+                <button class="w-full border border-gray-300 py-3 px-6 text-sm font-medium hover:border-gray-900 transition-colors">
+                    ADD TO WISHLIST
+                </button>
+            </div>
+
+            <!-- Product Details -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-sm font-medium text-gray-900 mb-3">DETAILS</h3>
+                <div class="prose prose-sm text-gray-600">
+                    <p>{{ product.description|linebreaks }}</p>
+                    <p>Created: {{ product.created_at|date:"F d, Y" }}</p>
+                </div>
+            </div>
+
+            <!-- Care Instructions -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-sm font-medium text-gray-900 mb-3">CARE</h3>
+                <div class="prose prose-sm text-gray-600">
+                    <p>Professional dry clean only</p>
+                    <p>Do not bleach</p>
+                    <p>Iron at low temperature</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-16 border-t border-gray-200 pt-16">
+        <h2 class="text-xl font-bold tracking-tight text-gray-900 mb-8">YOU MAY ALSO LIKE</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for related_product in related_products %}
+            <div class="product-card group cursor-pointer" 
+                 hx-get="{% url 'main:product_detail' related_product.slug %}"
+                 hx-target="#main-content"
+                 hx-push-url="true">
+                <div class="aspect-square overflow-hidden bg-gray-100 mb-4">
+                    {% if related_product.main_image %}
+                        <img src="{{ related_product.main_image.url }}" 
+                             alt="{{ related_product.name }}" 
+                             class="product-image w-full h-full object-cover">
+                    {% else %}
+                        <div class="product-image w-full h-full bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-400 text-sm">No Image</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="text-center">
+                    <h3 class="text-sm font-medium text-gray-900 mb-1">{{ related_product.name|upper }}</h3>
+                    <p class="text-sm text-gray-600 mb-1">{{ related_product.color|upper }}</p>
+                    <p class="text-sm font-medium">${{ related_product.price }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+<style>
+    .size-radio:checked + label {
+        background-color: black !important;
+        color: white !important;
+        border-color: black !important;
+    }
+    .size-radio:disabled + label {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+
+<script>
+    let selectedSize = null;
+    let selectedSizeId = null;
+
+    function changeMainImage(src) {
+        const mainImg = document.querySelector('.aspect-square img');
+        if (mainImg) {
+            mainImg.src = src;
+        }
+    }
+
+    function updateSelectedSize() {
+        const sizeRadios = document.querySelectorAll('.size-radio');
+        const checkedRadio = Array.from(sizeRadios).find(radio => radio.checked && !radio.disabled);
+        if (checkedRadio) {
+            selectedSize = checkedRadio.dataset.size;
+            selectedSizeId = checkedRadio.value;
+            console.log('Updated Selected Size:', selectedSize, 'ID:', selectedSizeId);
+        } else {
+            selectedSize = null;
+            selectedSizeId = null;
+            console.log('No valid size selected');
+        }
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-20 right-4 bg-black text-white px-6 py-3 rounded shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    function initializeSizeRadios() {
+        const sizeRadios = document.querySelectorAll('.size-radio');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        console.log('Size Radios Found:', sizeRadios.length);
+
+        if (sizeRadios.length === 0) {
+            console.log('No size radios available');
+            addToCartBtn.disabled = true;
+            addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            showNotification('No sizes available');
+            return;
+        }
+
+        const availableRadios = Array.from(sizeRadios).filter(radio => !radio.disabled);
+        console.log('Available Size Radios:', availableRadios.length);
+
+        if (availableRadios.length === 0) {
+            console.log('All sizes are out of stock');
+            addToCartBtn.disabled = true;
+            addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            showNotification('All sizes are out of stock');
+            return;
+        }
+
+        // Ensure at least one valid radio is checked
+        let checkedRadio = Array.from(sizeRadios).find(radio => radio.checked && !radio.disabled);
+        if (!checkedRadio && availableRadios.length > 0) {
+            availableRadios[0].checked = true;
+            checkedRadio = availableRadios[0];
+            console.log('Auto-checked first available radio:', checkedRadio.dataset.size, 'ID:', checkedRadio.value);
+        }
+
+        // Update selected size
+        updateSelectedSize();
+
+        // Add event listeners
+        sizeRadios.forEach(radio => {
+            radio.addEventListener('change', function(e) {
+                if (this.disabled) {
+                    console.log('Changed disabled radio:', this.dataset.size);
+                    return;
+                }
+                console.log('Radio Changed - Selected Size:', this.dataset.size, 'ID:', this.value);
+                updateSelectedSize();
+                addToCartBtn.disabled = false;
+                addToCartBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeSizeRadios);
+    document.addEventListener('htmx:afterSwap', initializeSizeRadios);
+
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+</script>

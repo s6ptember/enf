@@ -1,0 +1,90 @@
+{% block content %}
+<main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb and Filters -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 space-y-4 sm:space-y-0">
+        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 uppercase">
+            {% if current_category %}
+                {{ current_category|upper }} > NEW ARRIVALS
+            {% else %}
+                ALL PRODUCTS
+            {% endif %}
+        </h2>
+        <button class="bg-black text-white px-4 py-2 text-sm font-medium uppercase hover:bg-gray-800 transition-colors w-full sm:w-auto" 
+                hx-get="{% if current_category %}{% url 'main:catalog' current_category %}{% else %}{% url 'main:catalog_all' %}{% endif %}?show_filters=true&color={{ filter_params.color|urlencode }}&min_price={{ filter_params.min_price|urlencode }}&max_price={{ filter_params.max_price|urlencode }}&size={{ filter_params.size|urlencode }}" 
+                hx-target="#filter-modal-content"
+                hx-swap="innerHTML"
+                hx-on::after-request="document.getElementById('filter-modal').classList.remove('hidden')">
+            FILTERS
+        </button>
+    </div>
+
+    <!-- Filter Modal Container -->
+    <div id="filter-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div id="filter-modal-content" class="bg-white rounded-none max-w-md w-full"></div>
+    </div>
+
+    <!-- Product Grid -->
+    {% if products %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+        {% for product in products %}
+        <div class="product-card group cursor-pointer" 
+             hx-get="{% url 'main:product_detail' product.slug %}"
+             hx-target="#main-content"
+             hx-push-url="true">
+            <div class="aspect-square overflow-hidden bg-gray-100 mb-4">
+                {% if product.main_image %}
+                    <img src="{{ product.main_image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="product-image w-full h-full object-cover">
+                {% else %}
+                    <div class="product-image w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-400 text-sm">No Image</span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <h3 class="text-sm font-medium text-gray-900 mb-1 uppercase">{{ product.name }}</h3>
+                <p class="text-sm text-gray-600 mb-1 uppercase">{{ product.color }}</p>
+                <p class="text-sm font-medium">${{ product.price }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4 uppercase">No products found</h3>
+        <p class="text-gray-600 mb-8">
+            {% if current_category %}
+                No products available in this category yet.
+            {% else %}
+                No products available at the moment.
+            {% endif %}
+        </p>
+        <a href="{% url 'main:index' %}" 
+           hx-get="{% url 'main:index' %}" 
+           hx-target="#main-content" 
+           hx-push-url="true"
+           class="bg-black text-white px-6 py-3 text-sm font-medium uppercase hover:bg-gray-800 transition-colors">
+            Back to Home
+        </a>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+    // Product card hover and click functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}

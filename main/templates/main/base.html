@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ENFANTS RICHES DÉPRIMÉS{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .product-image {
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: black;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: black;
+        }
+
+        /* Mobile menu styles */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        .hamburger {
+            cursor: pointer;
+        }
+        
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background-color: black;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        /* Overlay */
+        .overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* HTMX loading indicator */
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 200ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Mobile Menu Overlay -->
+    <div id="overlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed top-0 left-0 w-80 h-full bg-white z-50 md:hidden shadow-lg">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-lg font-bold tracking-tight">
+                    ENFANTS RICHES <br>
+                    DÉPRIMÉS
+                </h2>   
+                <button id="closeMenu" class="hamburger active">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            
+            <nav class="space-y-6">
+                <a href="{% url 'main:index' %}" 
+                   hx-get="{% url 'main:index' %}" 
+                   hx-target="#main-content" 
+                   hx-push-url="true"
+                   class="mobile-nav-link block text-lg font-medium text-gray-900 hover:text-gray-700 py-2 border-b border-gray-200">
+                   HOME
+                </a>
+                {% for category in categories %}
+                <a href="{% url 'main:catalog' category.slug %}" 
+                   hx-get="{% url 'main:catalog' category.slug %}" 
+                   hx-target="#main-content" 
+                   hx-push-url="true"
+                   class="mobile-nav-link block text-lg font-medium text-gray-900 hover:text-gray-700 py-2 border-b border-gray-200 {% if current_category == category.slug %}active{% endif %}">
+                   {{ category.name|upper }}
+                </a>
+                {% endfor %}
+            </nav>
+            
+            <div class="mt-8 space-y-4">
+                <a href="#" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">SEARCH</a>
+                
+                <a class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
+                    ACCOUNT
+                </a>
+                <a href="#" id="mobileCart" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">CART (0)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Mobile Menu Button -->
+                <button id="menuToggle" class="hamburger md:hidden">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="{% url 'main:index' %}" 
+                       hx-get="{% url 'main:index' %}" 
+                       hx-target="#main-content" 
+                       hx-push-url="true">
+                        <h1 class="text-sm sm:text-lg font-bold tracking-tight text-left">
+                            ENFANTS RICHES<br>
+                            DÉPRIMÉS
+                        </h1>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    {% for category in categories %}
+                    <a href="{% url 'main:catalog' category.slug %}" 
+                       hx-get="{% url 'main:catalog' category.slug %}" 
+                       hx-target="#main-content" 
+                       hx-push-url="true"
+                       class="nav-link text-sm font-medium text-gray-900 hover:text-gray-700 {% if current_category == category.slug %}active{% endif %}">
+                       {{ category.name|upper }}
+                    </a>
+                    {% endfor %}
+                </nav>
+                
+                <!-- Right side links -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <div class="relative" id="mobile-search-wrapper">
+                        <button id="mobile-search-toggle" 
+                                hx-get="{% url 'main:catalog_all' %}?show_search=true" 
+                                hx-target="#mobile-search-wrapper" 
+                                hx-swap="innerHTML"
+                                class="text-sm font-medium uppercase hover:text-gray-600">
+                            SEARCH
+                        </button>
+                    </div>
+                    <a class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
+                        ACCOUNT
+                    </a>
+                    <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
+                </div>
+                
+                <!-- Mobile Cart Icon -->
+                <div class="md:hidden">
+                    <a href="#" id="mobileCartHeader" class="text-xs font-medium text-gray-900">CART (0)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div id="cart-container"></div>
+
+    <!-- Loading Indicator -->
+    <div class="htmx-indicator fixed top-0 left-0 w-full h-1 bg-black z-50"></div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        {% block content %}
+        <!-- Default home content -->
+        <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center py-20">
+                <h2 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+                    ENFANTS RICHES DÉPRIMÉS
+                </h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    Select a category to browse our collection
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    {% for category in categories %}
+                    <a href="{% url 'main:catalog' category.slug %}" 
+                       hx-get="{% url 'main:catalog' category.slug %}" 
+                       hx-target="#main-content" 
+                       hx-push-url="true"
+                       class="block p-8 border border-gray-200 hover:border-gray-300 transition-colors">
+                        <h3 class="text-xl font-bold">{{ category.name|upper }}</h3>
+                    </a>
+                    {% endfor %}    
+                </div>
+            </div>
+        </main>
+        {% endblock %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu functionality
+            const menuToggle = document.getElementById('menuToggle');
+            const closeMenu = document.getElementById('closeMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+    
+            function openMobileMenu() {
+                mobileMenu.classList.add('open');
+                overlay.classList.add('active');
+                menuToggle.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+    
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('open');
+                overlay.classList.remove('active');
+                menuToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+    
+            menuToggle.addEventListener('click', openMobileMenu);
+            closeMenu.addEventListener('click', closeMobileMenu);
+            overlay.addEventListener('click', closeMobileMenu);
+    
+            // Close mobile menu after navigation
+            document.addEventListener('htmx:afterRequest', function() {
+                closeMobileMenu();
+            });
+    
+        
+    
+            // Close mobile menu on window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    closeMobileMenu();
+                }
+            });
+    
+            // Update active navigation links after HTMX requests
+            document.addEventListener('htmx:afterSettle', function() {
+                updateActiveNavLinks();
+            });
+    
+            function updateActiveNavLinks() {
+                const currentPath = window.location.pathname;
+                const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === currentPath) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // Listen for cart updates
+            document.addEventListener('cartUpdated', function(e) {
+                if (e.detail && e.detail.total_items !== undefined) {
+                    updateHeaderCartCount(e.detail.total_items);
+                }
+            });
+        });
+        
+        // Global function to update cart count
+        window.updateHeaderCartCount = function(count) {
+            const desktopCart = document.getElementById('desktopCart');
+            const mobileCart = document.getElementById('mobileCart');
+            const mobileCartHeader = document.getElementById('mobileCartHeader');
+            const cartText = `CART (${count})`;
+            
+            if (desktopCart) desktopCart.textContent = cartText;
+            if (mobileCart) mobileCart.textContent = cartText;
+            if (mobileCartHeader) mobileCartHeader.textContent = cartText;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<div class="relative inline-block">
+    <input type="text" 
+           id="search-input" 
+           name="q" 
+           placeholder="SEARCH" 
+           value="{{ search_query|default:'' }}"
+           class="w-40 bg-white border border-gray-300 py-2 px-3 text-sm font-medium uppercase focus:outline-none focus:border-gray-900"
+           hx-get="{% url 'main:catalog_all' %}" 
+           hx-target="#main-content" 
+           hx-push-url="true"
+           hx-trigger="input delay:500ms"
+           hx-swap="innerHTML">
+    <button class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+            hx-get="{% url 'main:catalog_all' %}?reset_search=true" 
+            hx-target="#search-wrapper, #mobile-search-wrapper"
+            hx-swap="innerHTML"
+            hx-on::before-request="document.getElementById('search-input').value = ''; document.getElementById('search-input').placeholder = 'SEARCH';">
+        ×
+    </button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                if (this.value) {
+                    this.placeholder = '';
+                } else {
+                    this.placeholder = 'SEARCH';
+                }
+            });
+            searchInput.focus();
+        }
+    });
+</script>
