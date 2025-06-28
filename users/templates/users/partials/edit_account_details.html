@@ -1,0 +1,128 @@
+<style>
+    .dotted-input {
+        border: none;
+        border-bottom: 2px dotted #d1d5db;
+        background: transparent;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+    .dotted-input:focus {
+        border-bottom-color: #374151;
+    }
+    .dotted-input::placeholder {
+        color: #6b7280;
+        font-weight: 500;
+    }
+</style>
+
+<form method="post" action="#" class="space-y-6" 
+      hx-post="{% url 'users:update_account_details' %}" 
+      hx-target="#account-details-content">
+    {% csrf_token %}
+    
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+                <div class="text-red-500 text-xs mt-1">{{ form.first_name.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+                <div class="text-red-500 text-xs mt-1">{{ form.last_name.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div>
+        {{ form.email }}
+        {% if form.email.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.email.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.company }}
+        {% if form.company.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.company.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.address1 }}
+        {% if form.address1.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.address1.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.address2 }}
+        {% if form.address2.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.address2.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.city }}
+        {% if form.city.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.city.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.country }}
+        {% if form.country.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.country.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.province }}
+        {% if form.province.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.province.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.postal_code }}
+        {% if form.postal_code.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.postal_code.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {{ form.phone }}
+        {% if form.phone.errors %}
+            <div class="text-red-500 text-xs mt-1">{{ form.phone.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="flex gap-4">
+        <button 
+            type="submit"
+            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+        >
+            Save
+        </button>
+        <button 
+            type="button"
+            hx-get="{% url 'users:account_details' %}" 
+            hx-target="#account-details-content" 
+            class="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+        >
+            Cancel
+        </button>
+    </div>
+</form>
+
+<script>
+    document.querySelectorAll('.dotted-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+</script>

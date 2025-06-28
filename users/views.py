@@ -30,9 +30,9 @@ def login_view(request):
             user = form.get_user()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('main:index')
-        else:
-            form = CustomUserLoginForm()
-        return render(request, 'users/login.html', {'form': form})
+    else:
+        form = CustomUserLoginForm()
+    return render(request, 'users/login.html', {'form': form})
     
 
 @login_required(login_url='/users/login')

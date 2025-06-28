@@ -49,7 +49,7 @@ class CustomUser(AbstractUser):
     
 
     def clean(self):
-        for field in ['company', 'addres1', 'address2', 'city',
+        for field in ['company', 'address1', 'address2', 'city',
                       'country', 'province', 'postal_code', 'phone']:
             value = getattr(self, field)
             if value:

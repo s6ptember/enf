@@ -1,0 +1,140 @@
+{% block content %}
+<style>
+    .dotted-input {
+        border: none;
+        border-bottom: 2px dotted #d1d5db;
+        background: transparent;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+    .dotted-input:focus {
+        border-bottom-color: #374151;
+    }
+    .dotted-input::placeholder {
+        color: #6b7280;
+        font-weight: 500;
+    }
+</style>
+
+<div class="min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-gray-900 mb-8 text-center tracking-wide">
+            CREATE AN ACCOUNT
+        </h1>
+        
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="text-red-500 text-sm text-center">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <form id="createAccountForm" method="post" class="space-y-6" 
+              hx-post="{% url 'users:register' %}" 
+              hx-target="#main-content">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="text-red-500 text-xs mt-1">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="text-red-500 text-xs mt-1">{{ form.last_name.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="text-red-500 text-xs mt-1">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="text-red-500 text-xs mt-1">{{ form.password1.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="text-red-500 text-xs mt-1">{{ form.password2.errors }}</div>
+                {% endif %}
+                <div id="passwordError" class="text-red-500 text-xs mt-1 hidden">
+                    Passwords do not match
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 pt-4">
+                <button 
+                    type="submit"
+                    class="bg-black hover:bg-gray-500 text-white font-semibold py-3 px-6 transition-colors duration-200 text-sm tracking-wide"
+                >
+                    CREATE AN ACCOUNT
+                </button>
+                <a 
+                    href="{% url 'users:login' %}"
+                    hx-get="{% url 'users:login' %}"
+                    hx-target="#main-content"
+                    hx-push-url="true"
+                    class="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold py-3 px-6 transition-colors duration-200 text-sm tracking-wide text-center"
+                >
+                    LOGIN
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('createAccountForm');
+    const passwordInput = document.getElementById('id_password1');
+    const confirmPasswordInput = document.getElementById('id_password2');
+    const passwordError = document.getElementById('passwordError');
+
+    function validatePasswords() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (confirmPassword && password !== confirmPassword) {
+            passwordError.classList.remove('hidden');
+            confirmPasswordInput.classList.add('border-red-500');
+            return false;
+        } else {
+            passwordError.classList.add('hidden');
+            confirmPasswordInput.classList.remove('border-red-500');
+            return true;
+        }
+    }
+
+    confirmPasswordInput.addEventListener('input', validatePasswords);
+    passwordInput.addEventListener('input', () => {
+        if (confirmPasswordInput.value) {
+            validatePasswords();
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (!validatePasswords()) {
+            e.preventDefault();
+        }
+    });
+
+    document.querySelectorAll('.dotted-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+</script>
+{% endblock %}

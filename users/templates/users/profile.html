@@ -1,0 +1,194 @@
+{% load static %}
+{% block content %}
+<style>
+    .dotted-input {
+        border: none;
+        border-bottom: 2px dotted #d1d5db;
+        background: transparent;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+    .dotted-input:focus {
+        border-bottom-color: #374151;
+    }
+    .dotted-input::placeholder {
+        color: #6b7280;
+        font-weight: 500;
+    }
+    .card {
+        transition: transform 0.2s ease;
+    }
+</style>
+
+<div class="min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center tracking-wide">
+            HI, {{ request.user.first_name|upper }} {{ request.user.last_name|upper }}
+        </h1>
+        
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="text-red-500 text-sm text-center">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Sidebar -->
+            <div class="col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <ul class="space-y-4">
+                        <li class="nav-item">
+                            <a href="{% url 'users:profile' %}" 
+                               hx-get="{% url 'users:profile' %}" 
+                               hx-target="#main-content" 
+                               hx-push-url="true"
+                               class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900 {% if request.resolver_match.url_name == 'profile' %}text-gray-900 border-l-4 border-gray-500 pl-2{% endif %}">
+                                ACCOUNT
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" 
+                               hx-target="#main-content" 
+                               hx-push-url="true"
+                               class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900 {% if request.resolver_match.url_name == 'order_history' %}text-gray-900 border-l-4 border-gray-500 pl-2{% endif %}">
+                                ORDER HISTORY
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'users:logout' %}" 
+                               hx-get="{% url 'users:logout' %}" 
+                               hx-target="#main-content" 
+                               hx-push-url="true"
+                               class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
+                                LOG OUT
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-span-3" id="profile-main-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Latest Order -->
+                    <!-- <div class="bg-white p-6 rounded-lg shadow-lg card">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+                            LATEST ORDER
+                        </h2>
+                        {% if latest_order %}
+                            <p class="text-sm text-gray-700">Order #{{ latest_order.id }}</p>
+                            <p class="text-sm text-gray-700">Placed on: {{ latest_order.created_at|date:"F d, Y" }}</p>
+                            <p class="text-sm text-gray-700">Status: {{ latest_order.get_status_display }}</p>
+                            <p class="text-sm text-gray-700">Total: €{{ latest_order.get_discounted_total }}</p>
+                            <button 
+                                hx-get="{% url 'users:order_history' %}" 
+                                hx-target="#main-content" 
+                                hx-push-url="true"
+                                class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+                            >
+                                VIEW
+                            </button>
+                        {% else %}
+                            <p class="text-sm text-gray-700">You haven't placed any orders yet.</p>
+                            <button 
+                                href="{% url 'main:index' %}" 
+                                hx-get="{% url 'main:index' %}" 
+                                hx-target="#main-content" 
+                                hx-push-url="true"
+                                class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+                            >
+                                SHOP NOW
+                            </button>
+                        {% endif %}
+                    </div> -->
+                    
+                    <!-- Account Details -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg card" id="account-details-content">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+                            ACCOUNT DETAILS
+                        </h2>
+                        <div class="space-y-2">
+                            <p class="text-sm text-gray-700">Default Address</p>
+                            <p class="text-sm text-gray-700">{{ request.user.first_name }} {{ request.user.last_name }}</p>
+                            <p class="text-sm text-gray-700">{{ request.user.address1|default:"" }} {{ request.user.address2|default:"" }}</p>
+                            <p class="text-sm text-gray-700">{{ request.user.city|default:"" }}, {{ request.user.country|default:"Not specified" }}</p>
+                        </div>
+                        <div class="mt-4 flex gap-4">
+                            <button 
+                                hx-get="{% url 'users:edit_account_details' %}" 
+                                hx-target="#account-details-content" 
+                                hx-swap="innerHTML"
+                                class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+                            >
+                                Edit
+                            </button>
+                            <button 
+                                class="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendations -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+                        YOU MAY ALSO LIKE
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {% for product in recommended_products %}
+                            <div class="bg-white p-4 rounded-lg shadow-lg card">
+                                <div class="mb-4">
+                                    {% if product.main_image %}
+                                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded">
+                                    {% else %}
+                                        <img src="{% static 'img/placeholder.jpg' %}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded">
+                                    {% endif %}
+                                </div>
+                                <h3 class="text-sm font-semibold text-gray-900">{{ product.name }}</h3>
+                                <p class="text-sm text-gray-700">€{{ product.price }}</p>
+                                <a 
+                                    href="{% url 'main:product_detail' product.slug %}" 
+                                    hx-get="{% url 'main:product_detail' product.slug %}" 
+                                    hx-target="#main-content" 
+                                    hx-push-url="true"
+                                    class="mt-2 inline-block bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+                                >
+                                    CHOOSE OPTIONS
+                                </a>
+                            </div>
+                        {% empty %}
+                            <p class="text-sm text-gray-700">No recommended products available at the moment.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navItems = document.querySelectorAll('.nav-item a');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(nav => nav.classList.remove('text-gray-900', 'border-l-4', 'border-gray-500', 'pl-2'));
+                this.classList.add('text-gray-900', 'border-l-4', 'border-gray-500', 'pl-2');
+            });
+        });
+
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            const target = event.detail.target;
+            if (target.id === 'main-content' || target.id === 'account-details-content') {
+                target.classList.add('animate-section');
+                setTimeout(() => {
+                    target.classList.remove('animate-section');
+                }, 500);
+            }
+        });
+    });
+</script>
+{% endblock %}
