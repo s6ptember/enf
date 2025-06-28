@@ -1,0 +1,23 @@
+<div id="cart-notification" class="fixed top-20 right-4 bg-black text-white px-6 py-3 rounded shadow-lg z-50 transform translate-x-full transition-transform duration-300">
+    <div class="flex items-center space-x-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>{{ message }}</span>
+    </div>
+</div>
+
+<script>
+    // Show notification
+    setTimeout(() => {
+        document.getElementById('cart-notification').style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        document.getElementById('cart-notification').style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.getElementById('cart-notification').remove();
+        }, 300);
+    }, 3000);
+</script>

@@ -1,0 +1,16 @@
+<div class="text-center py-20 text-gray-500">
+    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+    </svg>
+    <p class="text-lg mb-4">Your cart is empty</p>
+    <button onclick="closeCart()" class="text-sm underline hover:text-gray-700">Continue shopping</button>
+</div>
+
+<script>
+    // Update cart count
+    document.getElementById('cart-count').textContent = '0';
+    updateHeaderCartCount(0);
+    
+    // Hide cart summary
+    document.getElementById('cart-summary').style.display = 'none';
+</script>

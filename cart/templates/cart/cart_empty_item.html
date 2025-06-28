@@ -1,0 +1,29 @@
+<!-- Empty div to replace removed item -->
+<div style="display: none;" data-removed-item="{{ item_id }}"></div>
+
+<script>
+    // Update cart totals
+    htmx.ajax('GET', '{% url "cart:cart_count" %}', {
+        target: '#cart-count',
+        swap: 'none',
+        onLoad: function(response) {
+            const data = JSON.parse(response);
+            document.getElementById('cart-count').textContent = data.total_items;
+            updateHeaderCartCount(data.total_items);
+            
+            // Update subtotal
+            const subtotalElement = document.querySelector('#cart-summary .font-bold:last-child');
+            if (subtotalElement) {
+                subtotalElement.textContent = '$' + data.subtotal.toFixed(2);
+            }
+            
+            // If cart is empty, show empty message
+            if (data.total_items === 0) {
+                htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
+                    target: '#cart-modal',
+                    swap: 'outerHTML'
+                });
+            }
+        }
+    });
+</script>
