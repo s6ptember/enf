@@ -193,6 +193,52 @@
             console.log('No valid size selected');
         }
     }
+
+    function addToCart() {
+        const productSlug = '{{ product.slug }}';
+        console.log('Product Slug:', productSlug);
+        
+        // Update selected size before sending
+        updateSelectedSize();
+        console.log('Selected Size ID:', selectedSizeId);
+
+        if (!selectedSizeId) {
+            showNotification('Please select a size');
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append('size_id', selectedSizeId);
+        formData.append('quantity', '1');
+        fetch(`{% url 'cart:add_to_cart' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', productSlug), {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            console.log('Response Status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data);
+            if (data.error) {
+                showNotification(data.error);
+            } else {
+                updateHeaderCartCount(data.total_items);
+                showNotification(data.message);
+                htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
+                    target: '#cart-container',
+                    swap: 'innerHTML'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error adding to cart');
+        });
+    }
     
     function getCookie(name) {
         let cookieValue = null;
