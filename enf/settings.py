@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'main',
     'cart',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +144,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SESSION_COOKIE_AGE = 86400 # 30 дней
 SESSION_SAVE_EVERY_REQUEST = True
+
+AUTH_USER_MODEL = 'users.CustomUser'
