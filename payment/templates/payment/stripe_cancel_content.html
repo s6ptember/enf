@@ -1,0 +1,13 @@
+<main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center py-20">
+        <h1 class="text-2xl font-bold text-gray-900 mb-4 uppercase">Order cancelled</h1>
+        <p class="text-gray-600 mb-8">Your order #{{ order.id }} was cancelled.</p>
+        <a href="{% url 'orders:checkout' %}" 
+           hx-get="{% url 'orders:checkout' %}" 
+           hx-target="#main-content" 
+           hx-push-url="true"
+           class="bg-black text-white px-6 py-3 text-sm font-medium uppercase hover:bg-gray-800 transition-colors">
+            Return to checkout
+        </a>
+    </div>
+</main>

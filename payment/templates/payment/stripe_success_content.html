@@ -1,0 +1,14 @@
+<main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center py-20">
+        <h1 class="text-2xl font-bold text-gray-900 mb-4 uppercase">Thank You for Your Order!</h1>
+        <p class="text-gray-600 mb-4">Your order #{{ order.id }} has been successfully placed.</p>
+        <p class="text-gray-600 mb-8">We'll send a confirmation to <strong>{{ order.email }}</strong> soon.</p>
+        <a href="{% url 'main:index' %}" 
+           hx-get="{% url 'main:index' %}" 
+           hx-target="#main-content" 
+           hx-push-url="true"
+           class="bg-black text-white px-6 py-3 text-sm font-medium uppercase hover:bg-gray-800 transition-colors">
+            Continue Shopping
+        </a>
+    </div>
+</main>

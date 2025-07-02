@@ -1,0 +1,26 @@
+<div class="space-y-3-checkout border-t-checkout pt-4-checkout">
+    <div class="flex-checkout justify-between-checkout text-sm-checkout">
+        <span class="summary-label-checkout">Итого • {{ cart|length }} товар{{ cart|length|pluralize:"а,ов" }}</span>
+        <span class="summary-value-checkout">€{{ total_price }}</span>
+    </div>
+    
+    <div class="flex-checkout justify-between-checkout text-sm-checkout">
+        <span class="summary-label-checkout">Доставка</span>
+        <span class="summary-value-checkout text-gray-600-checkout">Рассчитывается на следующем шаге</span>
+    </div>
+    
+    {% if discount > 0 %}
+        <div class="flex-checkout justify-between-checkout text-sm-checkout">
+            <span class="summary-label-checkout">Скидка ({{ discount }}%)</span>
+            <span class="summary-value-checkout">-€{{ total_price|sub:discounted_price }}</span>
+        </div>
+    {% endif %}
+    
+    <div class="flex-checkout justify-between-checkout text-lg-checkout font-medium-checkout pt-3-checkout border-t-checkout">
+        <span class="total-label-checkout">Итого</span>
+        <div class="text-right-checkout">
+            <span class="text-sm-checkout text-gray-600-checkout">EUR </span>
+            <span class="total-value-checkout">€{{ discounted_price }}</span>
+        </div>
+    </div>
+</div>
