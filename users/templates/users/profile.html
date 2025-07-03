@@ -49,8 +49,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" 
-                               hx-target="#main-content" 
+                            <a href="{% url 'users:order_history' %}" 
+                               hx-get="{% url 'users:order_history' %}" 
+                               hx-target="#profile-main-content" 
                                hx-push-url="true"
                                class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900 {% if request.resolver_match.url_name == 'order_history' %}text-gray-900 border-l-4 border-gray-500 pl-2{% endif %}">
                                 ORDER HISTORY
@@ -73,7 +74,7 @@
             <div class="col-span-3" id="profile-main-content">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Latest Order -->
-                    <!-- <div class="bg-white p-6 rounded-lg shadow-lg card">
+                    <div class="bg-white p-6 rounded-lg shadow-lg card">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
                             LATEST ORDER
                         </h2>
@@ -81,10 +82,10 @@
                             <p class="text-sm text-gray-700">Order #{{ latest_order.id }}</p>
                             <p class="text-sm text-gray-700">Placed on: {{ latest_order.created_at|date:"F d, Y" }}</p>
                             <p class="text-sm text-gray-700">Status: {{ latest_order.get_status_display }}</p>
-                            <p class="text-sm text-gray-700">Total: €{{ latest_order.get_discounted_total }}</p>
+                            <p class="text-sm text-gray-700">Total: €{{ latest_order.total_price|floatformat:2 }}</p>
                             <button 
-                                hx-get="{% url 'users:order_history' %}" 
-                                hx-target="#main-content" 
+                                hx-get="{% url 'users:order_detail' latest_order.id %}" 
+                                hx-target="#profile-main-content" 
                                 hx-push-url="true"
                                 class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
                             >
@@ -102,7 +103,7 @@
                                 SHOP NOW
                             </button>
                         {% endif %}
-                    </div> -->
+                    </div>
                     
                     <!-- Account Details -->
                     <div class="bg-white p-6 rounded-lg shadow-lg card" id="account-details-content">
@@ -131,6 +132,14 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Order History -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+                        ORDER HISTORY
+                    </h2>
+                    {% include 'users/partials/order_history.html' %}
                 </div>
                 
                 <!-- Recommendations -->
@@ -182,7 +191,7 @@
 
         document.body.addEventListener('htmx:afterSwap', function(event) {
             const target = event.detail.target;
-            if (target.id === 'main-content' || target.id === 'account-details-content') {
+            if (target.id === 'main-content' || target.id === 'profile-main-content' || target.id === 'account-details-content') {
                 target.classList.add('animate-section');
                 setTimeout(() => {
                     target.classList.remove('animate-section');

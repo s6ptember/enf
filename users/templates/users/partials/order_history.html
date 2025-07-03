@@ -1,0 +1,36 @@
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+        ORDER HISTORY
+    </h2>
+    {% if orders %}
+        <div class="space-y-4">
+            {% for order in orders %}
+                <div class="border-b border-gray-200 pb-4">
+                    <p class="text-sm text-gray-700">Order #{{ order.id }}</p>
+                    <p class="text-sm text-gray-700">Placed on: {{ order.created_at|date:"F d, Y" }}</p>
+                    <p class="text-sm text-gray-700">Status: {{ order.get_status_display }}</p>
+                    <p class="text-sm text-gray-700">Total: €{{ order.total_price|floatformat:2 }}</p>
+                    <button 
+                        hx-get="{% url 'users:order_detail' order.id %}" 
+                        hx-target="#profile-main-content" 
+                        hx-push-url="true"
+                        class="mt-2 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-1 px-3 transition-colors duration-200 text-sm tracking-wide"
+                    >
+                        VIEW DETAILS
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-sm text-gray-700">You haven't placed any orders yet.</p>
+        <button 
+            href="{% url 'main:index' %}" 
+            hx-get="{% url 'main:index' %}" 
+            hx-target="#main-content" 
+            hx-push-url="true"
+            class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+        >
+            SHOP NOW
+        </button>
+    {% endif %}
+</div>

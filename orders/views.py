@@ -11,7 +11,7 @@ from cart.views import CartMixin
 from cart.models import Cart
 from main.models import ProductSize
 from django.shortcuts import get_object_or_404
-from payment.views import create_stripe_checkout_session
+from payment.views import create_stripe_checkout_session, create_heleket_payment
 from decimal import Decimal
 import logging
 
@@ -116,6 +116,14 @@ class CheckoutView(CartMixin, View):
                         logger.info(f"HX-Redirect to Stripe: {checkout_session.url}")
                         return response
                     return redirect(checkout_session.url)
+                elif payment_provider == 'heleket':
+                    payment = create_heleket_payment(order, request)
+                    cart.clear()
+                    if request.headers.get('HX-Request'):
+                        response = HttpResponse(status=200)
+                        response['HX-Redirect'] = payment['url']
+                        return response
+                    return redirect(payment['url'])
             except Exception as e:
                 logger.error(f"Error creating payment: {str(e)}", exc_info=True)
                 order.delete()

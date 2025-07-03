@@ -1,0 +1,42 @@
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+        ORDER #{{ order.id }}
+    </h2>
+    <div class="space-y-4">
+        <p class="text-sm text-gray-700">Placed on: {{ order.created_at|date:"F d, Y" }}</p>
+        <p class="text-sm text-gray-700">Status: {{ order.get_status_display }}</p>
+        <p class="text-sm text-gray-700">Payment Provider: {{ order.get_payment_provider_display }}</p>
+        <p class="text-sm text-gray-700">Total: €{{ order.total_price|floatformat:2 }}</p>
+        <p class="text-sm text-gray-700">Shipping Address:</p>
+        <p class="text-sm text-gray-700">
+            {{ order.first_name }} {{ order.last_name }}<br>
+            {{ order.address1|default:"" }} {{ order.address2|default:"" }}<br>
+            {{ order.city|default:"" }}, {{ order.province|default:"" }} {{ order.postal_code|default:"" }}<br>
+            {{ order.country|default:"Not specified" }}
+        </p>
+        <p class="text-sm text-gray-700">Phone: {{ order.phone|default:"Not provided" }}</p>
+        <p class="text-sm text-gray-700">Email: {{ order.email }}</p>
+        
+        <h3 class="text-lg font-semibold text-gray-900 mt-4">Items</h3>
+        <div class="space-y-2">
+            {% for item in order.items.all %}
+                <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+                    <div>
+                        <p class="text-sm text-gray-700">{{ item.product.name }} - {{ item.size.size.name }}</p>
+                        <p class="text-sm text-gray-600">Quantity: {{ item.quantity }}</p>
+                    </div>
+                    <p class="text-sm text-gray-700">€{{ item.get_total_price|floatformat:2 }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <button 
+            hx-get="{% url 'users:order_history' %}" 
+            hx-target="#profile-main-content" 
+            hx-push-url="true"
+            class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
+        >
+            BACK TO ORDER HISTORY
+        </button>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-black mb-4">Order Cancelled</h1>
+    <p class="text-lg text-gray-600 mb-6">Your order #{{ order.id }} has been cancelled.</p>
+    <a href="{% url 'orders:checkout' %}" 
+       class="inline-block bg-black text-white py-3 px-6 font-bold hover:bg-gray-800 transition-colors">
+        Return to Checkout
+    </a>
+</div>

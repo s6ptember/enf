@@ -13,6 +13,7 @@ class Order(models.Model):
     )
     PAYMENT_PROVIDER_CHOICES = (
         ('stripe', 'Stripe'),
+        ('heleket', 'Heleket'),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
@@ -33,6 +34,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_provider = models.CharField(max_length=20, choices=PAYMENT_PROVIDER_CHOICES, null=True, blank=True)
     stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True)
+    heleket_payment_id = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

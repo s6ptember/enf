@@ -34,8 +34,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'domen.com', 'www.domen.com']
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
-    'http://domen.com',
-    'http://www.domen.com',
+    'https://domen.com',
+    'https://www.domen.com',
 ]
 
 CSRF_COOKIE_SECURE = True 
@@ -163,3 +163,6 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
+
+HELEKET_API_KEY = os.getenv('HELEKET_API_KEY')
+HELEKET_SECRET_KEY = os.getenv('HELEKET_SECRET_KEY')
