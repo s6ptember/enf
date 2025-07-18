@@ -4,111 +4,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ENFANTS RICHES DÉPRIMÉS{% endblock %}</title>
+    <title>{% block title %}EXAMPLE{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .product-image {
-            transition: transform 0.3s ease;
-        }
-        
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
-        
-        .nav-link {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link:hover::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background-color: black;
-        }
 
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background-color: black;
-        }
+    <link rel="stylesheet" href="{% static "css/style.css" %}"> 
+</head> 
+<body x-data="accessibilitySystem()" 
+      :class="{ 
+        'reduced-motion': settings.reduceMotion,
+        'high-contrast': settings.highContrast,
+        'large-cursor': settings.largeCursor,
+        'enhanced-focus': settings.enhancedFocus,
+        'dyslexia-font': settings.dyslexiaFont,
+        'focus-mode': settings.focusMode,
+        'reading-focus': settings.readingFocus
+      }"
+      class="bg-white transition-all duration-300">
 
-        /* Mobile menu styles */
-        .mobile-menu {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-        
-        .hamburger {
-            cursor: pointer;
-        }
-        
-        .hamburger span {
-            display: block;
-            width: 25px;
-            height: 2px;
-            background-color: black;
-            margin: 5px 0;
-            transition: 0.3s;
-        }
-        
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-        
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-        
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
-        }
+    <!-- Accessibility Panel -->
+    <div x-show="showAccessibilityPanel" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform -translate-y-full"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         class="fixed top-0 left-0 right-0 z-50 bg-gray-900 text-white p-4 shadow-lg"
+         role="dialog"
+         aria-label="Accessibility Settings"
+         aria-modal="true">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Accessibility Settings</h2>
+                <button @click="showAccessibilityPanel = false" 
+                        class="text-white hover:text-gray-300 text-2xl font-bold p-2"
+                        aria-label="Close accessibility panel">
+                    ×
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Font Size -->
+                <div class="bg-gray-800 p-4 rounded-lg">
+                    <label for="fontSize" class="block text-sm font-medium mb-2">Font Size</label>
+                    <input type="range" 
+                           id="fontSize"
+                           x-model="settings.fontSize" 
+                           min="14" max="24" step="2"
+                           @input="applyFontSize()"
+                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                           aria-label="Adjust font size">
+                    <div class="text-xs mt-1" x-text="settings.fontSize + 'px'"></div>
+                </div>
+                
+                <!-- Visual Settings -->
+                <div class="bg-gray-800 p-4 rounded-lg">
+                    <h3 class="font-medium mb-3">Visual Settings</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.highContrast" class="rounded" aria-describedby="high-contrast-desc">
+                            <span class="text-sm">High Contrast</span>
+                        </label>
+                        <div id="high-contrast-desc" class="sr-only">Increases contrast for better visibility</div>
+                        
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.largeCursor" class="rounded" aria-describedby="large-cursor-desc">
+                            <span class="text-sm">Large Cursor</span>
+                        </label>
+                        <div id="large-cursor-desc" class="sr-only">Makes the cursor larger and more visible</div>
+                        
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.enhancedFocus" class="rounded" aria-describedby="enhanced-focus-desc">
+                            <span class="text-sm">Enhanced Focus</span>
+                        </label>
+                        <div id="enhanced-focus-desc" class="sr-only">Improves visibility of focused elements</div>
+                    </div>
+                </div>
+                
+                <!-- ADHD Settings -->
+                <div class="bg-gray-800 p-4 rounded-lg">
+                    <h3 class="font-medium mb-3">ADHD & Focus</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.reduceMotion" class="rounded" aria-describedby="reduce-motion-desc">
+                            <span class="text-sm">Reduce Motion</span>
+                        </label>
+                        <div id="reduce-motion-desc" class="sr-only">Reduces animations and transitions</div>
+                        
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.focusMode" class="rounded" aria-describedby="focus-mode-desc">
+                            <span class="text-sm">Focus Mode</span>
+                        </label>
+                        <div id="focus-mode-desc" class="sr-only">Hides distracting elements</div>
+                        
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.readingFocus" class="rounded" aria-describedby="reading-focus-desc">
+                            <span class="text-sm">Reading Focus</span>
+                        </label>
+                        <div id="reading-focus-desc" class="sr-only">Creates a focused reading area that follows your cursor</div>
+                        
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="settings.dyslexiaFont" class="rounded" aria-describedby="dyslexia-font-desc">
+                            <span class="text-sm">Dyslexia Font</span>
+                        </label>
+                        <div id="dyslexia-font-desc" class="sr-only">Uses dyslexia-friendly font with better spacing</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Keyboard Shortcuts -->
+            <div class="mt-4 text-sm text-gray-300">
+                <strong>Keyboard Shortcuts:</strong> 
+                Alt+A - accessibility panel, Alt+S - text-to-speech, Alt+F - fullscreen
+            </div>
+        </div>
+    </div>
 
-        /* Overlay */
-        .overlay {
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease-in-out;
-        }
-        
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+    <!-- Accessibility Button -->
+    <button @click="showAccessibilityPanel = !showAccessibilityPanel"
+            class="fixed bottom-4 right-4 z-40 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+            :class="{ 'attention-animation': !settings.reduceMotion }"
+            aria-label="Open accessibility settings panel (Alt+A)"
+            title="Accessibility Settings">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+    </button>
 
-        /* HTMX loading indicator */
-        .htmx-indicator {
-            opacity: 0;
-            transition: opacity 200ms ease-in;
-        }
-        .htmx-request .htmx-indicator {
-            opacity: 1;
-        }
-        .htmx-request.htmx-indicator {
-            opacity: 1;
-        }
-    </style>
-</head>
-<body class="bg-white">
+    <!-- Reading Focus Overlay -->
+    <div x-show="settings.readingFocus" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="reading-focus-overlay">
+        <div id="reading-focus-window" class="reading-focus-window"></div>
+    </div>
+
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50">
+        Skip to main content
+    </a>
+
     <!-- Mobile Menu Overlay -->
     <div id="overlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
     
@@ -116,18 +155,17 @@
     <div id="mobileMenu" class="mobile-menu fixed top-0 left-0 w-80 h-full bg-white z-50 md:hidden shadow-lg">
         <div class="p-6">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-lg font-bold tracking-tight text-left">
-                    ENFANTS RICHES <br>
-                    DÉPRIMÉS
+                <h2 class="text-lg font-bold tracking-tight">
+                    EXAMPLE
                 </h2>
-                <button id="closeMenu" class="hamburger active">
+                <button id="closeMenu" class="hamburger active" aria-label="Close menu">
                     <span></span>
                     <span></span>
                     <span></span>
                 </button>
             </div>
             
-            <nav class="space-y-6">
+            <nav class="space-y-6" role="navigation" aria-label="Mobile navigation">
                 <a href="{% url 'main:index' %}" 
                    hx-get="{% url 'main:index' %}" 
                    hx-target="#main-content" 
@@ -144,28 +182,42 @@
                    {{ category.name|upper }}
                 </a>
                 {% endfor %}
+                <div class="mt-8 space-y-4">
+                    <div class="relative" id="mobile-search-wrapper">
+                        <button id="mobile-search-toggle" 
+                                hx-get="{% url 'main:catalog_all' %}?show_search=true" 
+                                hx-target="#mobile-search-wrapper" 
+                                hx-swap="innerHTML"
+                                class="text-sm font-medium uppercase hover:text-gray-600"
+                                aria-label="Open search">
+                            SEARCH
+                        </button>
+                    </div>
+                    <a href="{% url 'users:profile' %}" 
+                    hx-get="{% url 'users:profile' %}" 
+                    hx-target="#main-content" 
+                    hx-push-url="true"
+                    class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
+                        ACCOUNT
+                    </a>
+                    <button @click="toggleSpeech()" 
+                            class="text-sm font-medium text-gray-900 hover:text-gray-700 uppercase"
+                            :class="{ 'text-green-600': isSpeaking }"
+                            aria-label="Toggle text-to-speech">
+                        <span x-text="isSpeaking ? 'STOP SPEECH' : 'READ ALOUD'"></span>
+                    </button>
+                    <a href="#" id="mobileCart" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">CART (0)</a>
+                </div>
             </nav>
-            
-            <div class="mt-8 space-y-4">
-                <a href="#" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">SEARCH</a>
-                <a href="{% url 'users:profile' %}" 
-                hx-get="{% url 'users:profile' %}" 
-                hx-target="#main-content" 
-                hx-push-url="true"
-                class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
-                    ACCOUNT
-                </a>
-                <a href="#" id="mobileCart" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">CART (0)</a>
-            </div>
         </div>
     </div>
 
     <!-- Header -->
-    <header class="sticky top-0">
+    <header class="sticky top-0 bg-white" :style="'margin-top: ' + (showAccessibilityPanel ? '200px' : '0')">
         <div class="mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Mobile Menu Button -->
-                <button id="menuToggle" class="hamburger md:hidden">
+                <button id="menuToggle" class="hamburger md:hidden" aria-label="Open menu" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -176,16 +228,16 @@
                     <a href="{% url 'main:index' %}" 
                        hx-get="{% url 'main:index' %}" 
                        hx-target="#main-content" 
-                       hx-push-url="true">
-                        <h1 class="text-sm sm:text-lg font-bold tracking-tight text-left">
-                            ENFANTS RICHES <br>
-                            DÉPRIMÉS
+                       hx-push-url="true"
+                       aria-label="Go to homepage">
+                        <h1 class="text-sm sm:text-lg font-bold tracking-tight text-center">
+                            EXAMPLE
                         </h1>
                     </a>
                 </div>
                 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-8">
+                <nav class="hidden md:flex space-x-8" role="navigation" aria-label="Main navigation">
                     {% for category in categories %}
                     <a href="{% url 'main:catalog' category.slug %}" 
                        hx-get="{% url 'main:catalog' category.slug %}" 
@@ -204,7 +256,8 @@
                                 hx-get="{% url 'main:catalog_all' %}?show_search=true" 
                                 hx-target="#mobile-search-wrapper" 
                                 hx-swap="innerHTML"
-                                class="text-sm font-medium uppercase hover:text-gray-600">
+                                class="text-sm font-medium uppercase hover:text-gray-600"
+                                aria-label="Open search">
                             SEARCH
                         </button>
                     </div>
@@ -215,6 +268,12 @@
                     class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
                         ACCOUNT
                     </a>
+                    <button @click="toggleSpeech()" 
+                            class="text-sm font-medium text-gray-900 hover:text-gray-700 uppercase"
+                            :class="{ 'text-green-600': isSpeaking }"
+                            aria-label="Toggle text-to-speech">
+                        <span x-text="isSpeaking ? 'STOP' : 'SPEAK'"></span>
+                    </button>
                     <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
                 </div>
                 
@@ -230,147 +289,52 @@
     <!-- Loading Indicator -->
     <div class="htmx-indicator fixed top-0 left-0 w-full h-1 bg-black z-50"></div>
 
+    <!-- Live region for announcements -->
+    <div id="announcer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
     <!-- Main Content -->
-    <div id="main-content">
+    <main id="main-content" role="main">
         {% block content %}
-        <!-- Default home content -->
-        <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="text-center py-20">
-                <h2 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-                    ENFANTS RICHES DÉPRIMÉS
-                </h2>
-                <p class="text-lg text-gray-600 mb-8">
-                    Select a category to browse our collection
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                    {% for category in categories %}
-                    <a href="{% url 'main:catalog' category.slug %}" 
-                       hx-get="{% url 'main:catalog' category.slug %}" 
-                       hx-target="#main-content" 
-                       hx-push-url="true"
-                       class="block p-8 border border-gray-200 hover:border-gray-300 transition-colors">
-                        <h3 class="text-xl font-bold">{{ category.name|upper }}</h3>
-                    </a>
-                    {% endfor %}
+        <!-- Home content for HTMX requests -->
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="text-center py-20">
+                    <h2 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+                        EXAMPLE
+                    </h2>
+                    <p class="text-lg text-gray-600 mb-8">
+                        Select a category to browse our collection
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-screen">
+                        {% for category in categories %}
+                        <a href="{% url 'main:catalog' category.slug %}" 
+                        hx-get="{% url 'main:catalog' category.slug %}" 
+                        hx-target="#main-content" 
+                        hx-push-url="true"
+                        class="relative w-full h-screen group overflow-hidden bg-gray-200 transition-all duration-300"
+                        aria-label="Browse {{ category.name }} category">
+                            <!-- Background Image -->
+                            {% with product=category.products.first %}
+                                {% if product and product.main_image %}
+                                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ product.main_image.url }}');">
+                                        <!-- Overlay for text readability -->
+                                        <div class="absolute inset-0 bg-black bg-opacity-40 transition-opacity duration-300 group-hover:bg-opacity-60"></div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            <!-- Category Text -->
+                            <div class="relative z-10 flex items-center justify-center w-full h-full text-white text-center p-6">
+                                <h3 class="text-3xl font-bold uppercase tracking-wide drop-shadow-lg transform transition-transform duration-300 group-hover:scale-105">
+                                    {{ category.name }}
+                                </h3>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </main>
         {% endblock %}
-    </div>
+    </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu functionality
-            const menuToggle = document.getElementById('menuToggle');
-            const closeMenu = document.getElementById('closeMenu');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('overlay');
-    
-            function openMobileMenu() {
-                mobileMenu.classList.add('open');
-                overlay.classList.add('active');
-                menuToggle.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-    
-            function closeMobileMenu() {
-                mobileMenu.classList.remove('open');
-                overlay.classList.remove('active');
-                menuToggle.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-    
-            menuToggle.addEventListener('click', openMobileMenu);
-            closeMenu.addEventListener('click', closeMobileMenu);
-            overlay.addEventListener('click', closeMobileMenu);
-    
-            // Close mobile menu after navigation
-            document.addEventListener('htmx:afterRequest', function() {
-                closeMobileMenu();
-            });
-    
-            // Cart functionality
-            const desktopCart = document.getElementById('desktopCart');
-            const mobileCart = document.getElementById('mobileCart');
-            const mobileCartHeader = document.getElementById('mobileCartHeader');
-            
-            // Get initial cart count
-            updateCartCount();
-            
-            function updateHeaderCartCount(count) {
-                const cartText = `CART (${count})`;
-                if (desktopCart) desktopCart.textContent = cartText;
-                if (mobileCart) mobileCart.textContent = cartText;
-                if (mobileCartHeader) mobileCartHeader.textContent = cartText;
-            }
-            
-            function updateCartCount() {
-                fetch('{% url "cart:cart_count" %}')
-                    .then(response => response.json())
-                    .then(data => {
-                        updateHeaderCartCount(data.total_items);
-                    });
-            }
-    
-            function openCart() {
-                htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
-                    target: '#cart-container',
-                    swap: 'innerHTML'
-                });
-            }
-    
-            [desktopCart, mobileCart, mobileCartHeader].forEach(cartLink => {
-                if (cartLink) {
-                    cartLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        openCart();
-                    });
-                }
-            });
-    
-            // Close mobile menu on window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    closeMobileMenu();
-                }
-            });
-    
-            // Update active navigation links after HTMX requests
-            document.addEventListener('htmx:afterSettle', function() {
-                updateActiveNavLinks();
-            });
-    
-            function updateActiveNavLinks() {
-                const currentPath = window.location.pathname;
-                const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
-                
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === currentPath) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-            
-            // Listen for cart updates
-            document.addEventListener('cartUpdated', function(e) {
-                if (e.detail && e.detail.total_items !== undefined) {
-                    updateHeaderCartCount(e.detail.total_items);
-                }
-            });
-        });
-        
-        // Global function to update cart count
-        window.updateHeaderCartCount = function(count) {
-            const desktopCart = document.getElementById('desktopCart');
-            const mobileCart = document.getElementById('mobileCart');
-            const mobileCartHeader = document.getElementById('mobileCartHeader');
-            const cartText = `CART (${count})`;
-            
-            if (desktopCart) desktopCart.textContent = cartText;
-            if (mobileCart) mobileCart.textContent = cartText;
-            if (mobileCartHeader) mobileCartHeader.textContent = cartText;
-        };
-    </script>
+    <script src="{% static "js/scripts.js" %}"></script> 
 </body>
 </html>

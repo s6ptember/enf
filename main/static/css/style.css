@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Accessibility Styles */
+/* Reduced motion for ADHD */
+.reduced-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+/* High contrast */
+.high-contrast {
+    filter: contrast(150%) brightness(100%);
+}
+
+/* Large cursor */
+.large-cursor * {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="black"/></svg>') 16 16, auto;
+}
+
+/* Enhanced focus for keyboard navigation */
+.enhanced-focus *:focus {
+    outline: 4px solid #fbbf24 !important;
+    outline-offset: 2px !important;
+}
+
+/* Dyslexia-friendly font */
+.dyslexia-font {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    letter-spacing: 0.1em;
+    word-spacing: 0.2em;
+    line-height: 1.8;
+}
+
+/* Attention animation */
+.attention-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Focus mode - hide distracting elements */
+.focus-mode .decorative {
+    display: none !important;
+}
+
+.focus-mode .product-card {
+    border: 3px solid #3b82f6 !important;
+    background: #f8fafc !important;
+}
+
+/* Reading Focus Mode */
+.reading-focus {
+    position: relative;
+}
+
+.reading-focus-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 30;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.reading-focus-window {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    background: transparent;
+    box-shadow: 
+        0 -2000px 0 2000px rgba(0, 0, 0, 0.5),
+        0 400px 0 2000px rgba(0, 0, 0, 0.5);
+    transition: top 0.1s ease-out;
+    pointer-events: none;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Original styles */
+.product-image {
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.nav-link {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: black;
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: black;
+}
+
+/* Mobile menu styles */
+.mobile-menu {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.mobile-menu.open {
+    transform: translateX(0);
+}
+
+.hamburger {
+    cursor: pointer;
+}
+
+.hamburger span {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: black;
+    margin: 5px 0;
+    transition: 0.3s;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* Overlay */
+.overlay {
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* HTMX loading indicator */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+.htmx-request .htmx-indicator {
+    opacity: 1;
+}
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}
